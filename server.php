@@ -9,11 +9,11 @@ $allowedResourceTypes = [
 ];
 
 // Validamos que el recurso este disponible.
-//$resourceType = $_GET['resource_type'];
+$resourceType = $_GET['resource_type'];
 
-//if( !in_array($resourceType, $allowedResourceTypes) ) {
-//    die;
-//}
+if( !in_array($resourceType, $allowedResourceTypes) ) {
+    die;
+}
 
 // Defino los recursos
 
@@ -65,6 +65,17 @@ switch( strtoupper($_SERVER['REQUEST_METHOD']) ) {
         //Este ejemplo se deberia usar para guardar los datos en una base de datos pero lo haremos en el mismo archivo.
         break;
     case 'PUT':
+        //Validamos que el recurso exista.
+        if (!empty($resourceId) && array_key_exists( $resourceId, $books ) ) {
+            //Tomamos la entrada cruda
+            $json = file_get_contents('php://input');
+
+            // Transformamos el json a un nuevo elemento.
+            $books[ $resourceId ] = json_decode( $json, true );
+
+            //Retornamos la coleccion modificada en formato json
+            echo json_encode( $books );
+        }
         break;
     case 'DELETE':
         break;
