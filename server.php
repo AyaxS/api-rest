@@ -9,11 +9,11 @@ $allowedResourceTypes = [
 ];
 
 // Validamos que el recurso este disponible.
-$resourceType = $_GET['resource_type'];
+//$resourceType = $_GET['resource_type'];
 
-if(!in_array($resourceType, $allowedResourceTypes)) {
-    die;
-}
+//if( !in_array($resourceType, $allowedResourceTypes) ) {
+//    die;
+//}
 
 // Defino los recursos
 
@@ -32,7 +32,7 @@ $books = [
         'titulo' => 'La Odisea',
         'id_autor' => 1,
         'id_genero' => 1,
-    ]
+    ],
 ];
 
 //Encabezado
@@ -54,6 +54,15 @@ switch( strtoupper($_SERVER['REQUEST_METHOD']) ) {
         
         break;
     case 'POST':
+        //file_get_contents es una funcion que lee un archivo por completo y devuelve su contenido.
+        $json = file_get_contents('php://input');
+
+        $books[] = json_decode( $json, true );
+
+        //Funcion que devuelve la key del nuevo libro
+        echo array_keys( $books )[ count($books) - 1 ];
+
+        //Este ejemplo se deberia usar para guardar los datos en una base de datos pero lo haremos en el mismo archivo.
         break;
     case 'PUT':
         break;
