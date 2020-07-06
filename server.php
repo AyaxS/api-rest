@@ -11,29 +11,68 @@
 
 
 //Autenticación vía HMAC
-if (
-    !array_key_exists('HTTP_X_HASH', $_SERVER) ||
-    !array_key_exists('HTTP_X_TIMESTAMP', $_SERVER) ||
-    !array_key_exists('HTTP_X_UID', $_SERVER)
-) {
+// if (
+//     !array_key_exists('HTTP_X_HASH', $_SERVER) ||
+//     !array_key_exists('HTTP_X_TIMESTAMP', $_SERVER) ||
+//     !array_key_exists('HTTP_X_UID', $_SERVER)
+// ) {
+//     die;
+// }
+
+// list( $hash, $uid, $timestamp ) = [
+//     $_SERVER['HTTP_X_HASH'],
+//     $_SERVER['HTTP_X_UID'],
+//     $_SERVER['HTTP_X_TIMESTAMP'],
+// ];
+
+// $secret = 'Sh!! secreto!';
+
+// $newHash = sha1($uid.$timestamp.$secret);  
+
+// if ( $newHash !== $hash ) {
+//     die;
+// }
+
+
+//Autenticación vía Access Tokens
+
+if ( !array_key_exists('HTTP_X_TOKEN', $_SERVER) ) {
     die;
 }
 
-list( $hash, $uid, $timestamp ) = [
-    $_SERVER['HTTP_X_HASH'],
-    $_SERVER['HTTP_X_UID'],
-    $_SERVER['HTTP_X_TIMESTAMP'],
-];
+$url = 'http://localhost:8001';
 
-$secret = 'Sh!! secreto!';
+$ch = curl_init( $url );
+curl_setopt(
+    $ch,
+    CURLOPT_HTTPHEADER [
+        "X-Token: {$_SERVER['HTTP_X_TOKEN']}"
+    ]);
+curl_setopt(
+    $ch,
+    CURLOPT_RETURNTRANSFER,
+    true
+);
 
-$newHash = sha1($uid.$timestamp.$secret);  
+$ret = curl_exec( $ch );
 
-if ( $newHash !== $hash ) {
+if ( $ret === 'true') {
     die;
 }
 
-//Comando: curl http://christ:1234@localhost:8000/books -H 'X-HASH: 77b79cc6ad29c58cb0f337de01cb777f9e5e48b3' -H 'X-UID: 1' -H 'X-TIMESTAMP: 1593999645'
+$ret = curl_exec( $ch );
+
+// Está forma es la más compleja de todas, pero también es la forma más segura utilizada para información muy sensible. El servidor al que le van a hacer las consultas se va a partir en dos:
+
+// Uno se va a encargar específicamente de la autenticación.
+// El otro se va a encargar de desplegar los recursos de la API.
+// El flujo de la petición es la siguiente:
+
+// Nuestro usuario hace una petición al servidor de autenticación para pedir un token.
+// El servidor le devuelve el token.
+// El usuario hace una petición al servidor para pedir recursos de la API.
+// El servidor con los recursos hace una petición al servidor de autenticación para verificar que el token sea válido.
+// Una vez verificado el token, el servidor le devuelve los recursos al cliente.
 
 // Definimos los recursos disponibles
 $allowedResourceTypes = [
