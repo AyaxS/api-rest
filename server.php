@@ -1,11 +1,39 @@
 <?php
 
-$user = array_key_exists( 'PHP_AUTH_USER', $_SERVER ) ? $_SERVER['PHP_AUTH_USER'] : '';
-$pwd = array_key_exists( 'PHP_AUTH_PW', $_SERVER ) ? $_SERVER['PHP_AUTH_PW'] : '';
+//Autenticacion via HTTP
+// $user = array_key_exists( 'PHP_AUTH_USER', $_SERVER ) ? $_SERVER['PHP_AUTH_USER'] : '';
+// $pwd = array_key_exists( 'PHP_AUTH_PW', $_SERVER ) ? $_SERVER['PHP_AUTH_PW'] : '';
 
-if( $user !== 'christ' || $pwd !== '1234' ) {
+// if( $user !== 'christ' || $pwd !== '1234' ) {
+//     die;
+// }
+//Comando: curl http://christ:1234@localhost:8000/books
+
+
+//Autenticación vía HMAC
+if (
+    !array_key_exists('HTTP_X_HASH', $_SERVER) ||
+    !array_key_exists('HTTP_X_TIMESTAMP', $_SERVER) ||
+    !array_key_exists('HTTP_X_UID', $_SERVER)
+) {
     die;
 }
+
+list( $hash, $uid, $timestamp ) = [
+    $_SERVER['HTTP_X_HASH'],
+    $_SERVER['HTTP_X_UID'],
+    $_SERVER['HTTP_X_TIMESTAMP'],
+];
+
+$secret = 'Sh!! secreto!';
+
+$newHash = sha1($uid.$timestamp.$secret);  
+
+if ( $newHash !== $hash ) {
+    die;
+}
+
+//Comando: curl http://christ:1234@localhost:8000/books -H 'X-HASH: 77b79cc6ad29c58cb0f337de01cb777f9e5e48b3' -H 'X-UID: 1' -H 'X-TIMESTAMP: 1593999645'
 
 // Definimos los recursos disponibles
 $allowedResourceTypes = [
