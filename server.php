@@ -1,5 +1,11 @@
 <?php
-// Exponer datos a través de HTTP GET
+
+$user = array_key_exists( 'PHP_AUTH_USER', $_SERVER ) ? $_SERVER['PHP_AUTH_USER'] : '';
+$pwd = array_key_exists( 'PHP_AUTH_PW', $_SERVER ) ? $_SERVER['PHP_AUTH_PW'] : '';
+
+if( $user !== 'christ' || $pwd !== '1234' ) {
+    die;
+}
 
 // Definimos los recursos disponibles
 $allowedResourceTypes = [
@@ -9,11 +15,11 @@ $allowedResourceTypes = [
 ];
 
 // Validamos que el recurso este disponible.
-$resourceType = $_GET['resource_type'];
+//$resourceType = $_GET['resource_type'];
 
-if( !in_array($resourceType, $allowedResourceTypes) ) {
-    die;
-}
+//if( !in_array($resourceType, $allowedResourceTypes) ) {
+//    die;
+//}
 
 // Defino los recursos
 
